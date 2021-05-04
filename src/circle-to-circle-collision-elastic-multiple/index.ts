@@ -1,12 +1,18 @@
 import P5, { Vector } from 'p5';
 import Circle from './circle';
+import {
+  CANVAS_HEIGHT,
+  CANVAS_ORIGIN_X,
+  CANVAS_ORIGIN_Y,
+  CANVAS_WIDTH,
+} from './constants';
 
 const rootElement = document.getElementById('root') as HTMLElement;
 
 export const sketch = new P5(() => null, rootElement);
 
 const drawCanvas = () => {
-  sketch.createCanvas(800, 800);
+  sketch.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 };
 
 const detectColllision = (c1: Circle, c2: Circle) => {
@@ -48,50 +54,50 @@ const resolveCollision = (c1: Circle, c2: Circle) => {
 };
 
 const resolvePenetrationToEdges = (circle: Circle) => {
-  if (circle.position.x - circle.radius <= 0) {
+  if (circle.position.x - circle.radius <= CANVAS_ORIGIN_X) {
     const depth = circle.radius - circle.position.x;
     circle.position.x = circle.position.x + depth;
   }
 
-  if (circle.position.x + circle.radius >= 800) {
-    const depth = circle.position.x + circle.radius - 800;
+  if (circle.position.x + circle.radius >= CANVAS_WIDTH) {
+    const depth = circle.position.x + circle.radius - CANVAS_WIDTH;
     circle.position.x = circle.position.x - depth;
   }
 
-  if (circle.position.y - circle.radius < 0) {
+  if (circle.position.y - circle.radius < CANVAS_ORIGIN_Y) {
     const depth = circle.radius - circle.position.y;
     circle.position.y = circle.position.y + depth;
   }
 
-  if (circle.position.y + circle.radius > 800) {
-    const depth = circle.position.y + circle.radius - 800;
+  if (circle.position.y + circle.radius > CANVAS_HEIGHT) {
+    const depth = circle.position.y + circle.radius - CANVAS_HEIGHT;
     circle.position.y = circle.position.y - depth;
   }
 };
 
 const resolveCollisionToEdges = (circle: Circle) => {
-  if (circle.position.x - circle.radius <= 0) {
+  if (circle.position.x - circle.radius <= CANVAS_ORIGIN_X) {
     circle.velocity = sketch.createVector(
       circle.velocity.x * -1,
       circle.velocity.y,
     );
   }
 
-  if (circle.position.x + circle.radius >= 800) {
+  if (circle.position.x + circle.radius >= CANVAS_WIDTH) {
     circle.velocity = sketch.createVector(
       circle.velocity.x * -1,
       circle.velocity.y,
     );
   }
 
-  if (circle.position.y - circle.radius <= 0) {
+  if (circle.position.y - circle.radius <= CANVAS_ORIGIN_Y) {
     circle.velocity = sketch.createVector(
       circle.velocity.x,
       circle.velocity.y * -1,
     );
   }
 
-  if (circle.position.y + circle.radius >= 800) {
+  if (circle.position.y + circle.radius >= CANVAS_HEIGHT) {
     circle.velocity = sketch.createVector(
       circle.velocity.x,
       circle.velocity.y * -1,
@@ -99,7 +105,33 @@ const resolveCollisionToEdges = (circle: Circle) => {
   }
 };
 
-const circles = [new Circle(400, 400, 48, 48), new Circle(300, 300, 24, 24)];
+const circles = [
+  new Circle(400, 400, 48, 48),
+  new Circle(160, 160, 24, 24),
+  new Circle(240, 240, 24, 24),
+  new Circle(320, 320, 24, 24),
+  new Circle(480, 480, 24, 24),
+  new Circle(560, 560, 24, 24),
+  new Circle(640, 640, 24, 24),
+  new Circle(640, 160, 24, 24),
+  new Circle(560, 240, 24, 24),
+  new Circle(480, 320, 24, 24),
+  new Circle(320, 480, 24, 24),
+  new Circle(240, 560, 24, 24),
+  new Circle(160, 640, 24, 24),
+  new Circle(287, 400, 24, 24),
+  new Circle(513, 400, 24, 24),
+  new Circle(400, 287, 24, 24),
+  new Circle(400, 513, 24, 24),
+  new Circle(174, 400, 24, 24),
+  new Circle(626, 400, 24, 24),
+  new Circle(400, 174, 24, 24),
+  new Circle(400, 626, 24, 24),
+  new Circle(61, 400, 24, 24),
+  new Circle(739, 400, 24, 24),
+  new Circle(400, 61, 24, 24),
+  new Circle(400, 739, 24, 24),
+];
 
 const controlTargetCircle = circles[0];
 
@@ -112,7 +144,7 @@ sketch.draw = () => {
   sketch.stroke('#FFFFFF');
   sketch.strokeWeight(1);
   sketch.noFill();
-  sketch.rect(0, 0, 800, 800);
+  sketch.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
   if (upArrowKeyIsPressed) {
     controlTargetCircle.acceleration.y = -1;

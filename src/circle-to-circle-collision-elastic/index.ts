@@ -105,33 +105,7 @@ const resolveCollisionToEdges = (circle: Circle) => {
   }
 };
 
-const circles = [
-  new Circle(400, 400, 48, 48),
-  new Circle(160, 160, 24, 24),
-  new Circle(240, 240, 24, 24),
-  new Circle(320, 320, 24, 24),
-  new Circle(480, 480, 24, 24),
-  new Circle(560, 560, 24, 24),
-  new Circle(640, 640, 24, 24),
-  new Circle(640, 160, 24, 24),
-  new Circle(560, 240, 24, 24),
-  new Circle(480, 320, 24, 24),
-  new Circle(320, 480, 24, 24),
-  new Circle(240, 560, 24, 24),
-  new Circle(160, 640, 24, 24),
-  new Circle(287, 400, 24, 24),
-  new Circle(513, 400, 24, 24),
-  new Circle(400, 287, 24, 24),
-  new Circle(400, 513, 24, 24),
-  new Circle(174, 400, 24, 24),
-  new Circle(626, 400, 24, 24),
-  new Circle(400, 174, 24, 24),
-  new Circle(400, 626, 24, 24),
-  new Circle(61, 400, 24, 24),
-  new Circle(739, 400, 24, 24),
-  new Circle(400, 61, 24, 24),
-  new Circle(400, 739, 24, 24),
-];
+const circles = [new Circle(400, 400, 48, 48), new Circle(300, 300, 24, 24)];
 
 const controlTargetCircle = circles[0];
 
