@@ -1,5 +1,5 @@
 import { Vector } from 'p5';
-import { FRICTION, JERK } from './constants';
+import { FRICTION } from './constants';
 import { sketch } from './index';
 
 class Circle {
@@ -14,42 +14,25 @@ class Circle {
     y: number,
     public radius: number,
     public mass: number,
-    private color = '#F472B6',
   ) {
-    this.elasticity = 1;
-
     this.radius = radius;
     this.mass = mass;
-    this.color = color;
 
     this.position = sketch.createVector(x, y);
     this.velocity = sketch.createVector(0, 0);
     this.acceleration = sketch.createVector(0, 0);
   }
 
-  accelerate(direction: 'x' | 'y', amount: number) {
-    switch (direction) {
-      case 'x': {
-        this.acceleration.x = amount;
-        break;
-      }
-      case 'y': {
-        this.acceleration.y = amount;
-        break;
-      }
-    }
-  }
-
   drawCircle() {
     sketch.push();
-    sketch.fill(this.color);
-    sketch.noStroke();
+    sketch.noFill();
+    sketch.stroke('#FFFFFF');
     sketch.circle(this.position.x, this.position.y, this.radius * 2);
     sketch.pop();
   }
 
   drawRepositionedCircle() {
-    this.acceleration.normalize().mult(JERK);
+    this.acceleration.normalize().mult(1);
     this.velocity.add(this.acceleration);
     this.velocity.mult(1 - FRICTION);
     this.position.add(this.velocity);

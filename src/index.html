@@ -1,13 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <title>Physics Simulations</title>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Collision Simulation</title>
+    <link href="./index.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <div id="root"></div>
-    <script src="./index.ts"></script>
+    <div class="bg-coolGray-900 min-h-screen">
+      <div
+        class="max-w-full tablet:max-w-full desktop:max-w-270 desktop:mx-auto"
+      >
+        <div
+          class="grid grid-cols-4 tablet:grid-cols-12 gap-4 tablet:gap-4 desktop:gap-6 mx-4 tablet:mx-4 desktop:mx-6"
+        >
+          <div class="col-span-12">
+            <div class="mt-8">
+              <a href="index.html">
+                <h1 class="text-2xl text-white font-sans font-bold">
+                  Physics Simulations
+                </h1>
+              </a>
+              <div class="mt-2">
+                <a
+                  href="https://github.com/alexKwonIsAwesome/physics-simulation"
+                  target="_blank"
+                >
+                  <span class="text-white font-sans underline">Github</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <ul class="list-disc list-inside">
+                <li class="text-white underline">
+                  <a href="circle-movement/index.html"> Circle Movement </a>
+                </li>
+                <li class="text-white underline">
+                  <a href="one-dimensional-collision-elastic/index.html">
+                    One Dimensional Collision (Elastic)
+                  </a>
+                </li>
+                <li class="text-white underline">
+                  <a href="one-dimensional-collision-with-friction/index.html">
+                    One Dimensional Collision (With Friction)
+                  </a>
+                </li>
+                <li class="text-white underline">
+                  <a href="circle-to-circle-collision-elastic/index.html">
+                    Circle to Circle Collision (Elastic)
+                  </a>
+                </li>
+                <li class="text-white underline">
+                  <a href="circle-to-circle-collision-with-friction/index.html">
+                    Circle to Circle Collision (With Friction)
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

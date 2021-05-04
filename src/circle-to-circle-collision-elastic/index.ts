@@ -1,61 +1,112 @@
 import P5, { Vector } from 'p5';
 import Circle from './circle';
-import { JERK } from './constants';
+import {
+  CANVAS_HEIGHT,
+  CANVAS_ORIGIN_X,
+  CANVAS_ORIGIN_Y,
+  CANVAS_WIDTH,
+} from './constants';
 
 const rootElement = document.getElementById('root') as HTMLElement;
 
 export const sketch = new P5(() => null, rootElement);
 
 const drawCanvas = () => {
-  sketch.createCanvas(800, 800);
+  sketch.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 };
 
 const detectColllision = (c1: Circle, c2: Circle) => {
   return c1.radius + c2.radius >= Vector.sub(c2.position, c1.position).mag();
 };
 
-const getInvertedMass = (mass: number) => {
-  return mass === 0 ? 0 : 1 / mass;
-};
-
 const resolvePenetration = (c1: Circle, c2: Circle) => {
   const distance = Vector.sub(c1.position, c2.position);
   const depth = c1.radius + c2.radius - distance.mag();
-
-  const invertedC1Mass = getInvertedMass(c1.mass);
-  const invertedC2Mass = getInvertedMass(c2.mass);
-
-  const resolution = distance
-    .copy()
-    .normalize()
-    .mult(depth / (invertedC1Mass + invertedC2Mass));
-
-  c1.position.add(resolution.mult(invertedC1Mass));
-  c2.position.add(resolution.mult(-1 * invertedC2Mass));
+  const resolution = distance.copy().normalize().mult(depth);
+  c1.position.add(resolution.mult(1));
+  c2.position.add(resolution.mult(-1));
 };
 
 const resolveCollision = (c1: Circle, c2: Circle) => {
-  const collisionNormal = Vector.sub(c1.position, c2.position).normalize();
-  const relativeVelocity = Vector.sub(c1.velocity, c2.velocity);
-  const separatingVelociyScalar = Vector.dot(relativeVelocity, collisionNormal);
-  const newSeparatingVelociyScalar =
-    separatingVelociyScalar * -1 * Math.min(c1.elasticity, c2.elasticity);
+  const pDiff = Vector.sub(c2.position, c1.position);
+  const angle = -Math.atan2(pDiff.y, pDiff.x);
 
-  const separatingVelocityScalarDiff =
-    newSeparatingVelociyScalar - separatingVelociyScalar;
+  const m1 = c1.mass;
+  const m2 = c2.mass;
 
-  const invertedC1Mass = getInvertedMass(c1.mass);
-  const invertedC2Mass = getInvertedMass(c2.mass);
-  const impulse =
-    separatingVelocityScalarDiff / (invertedC1Mass + invertedC2Mass);
-  const impulseVec = Vector.mult(collisionNormal, impulse);
+  const u1 = c1.velocity.copy().rotate(angle);
+  const u2 = c2.velocity.copy().rotate(angle);
 
-  c1.velocity.add(Vector.mult(impulseVec, invertedC1Mass));
-  c2.velocity.add(Vector.mult(impulseVec, invertedC2Mass * -1));
+  const v1 = sketch.createVector(
+    (u1.x * (m1 - m2)) / (m1 + m2) + (2 * m2 * u2.x) / (m1 + m2),
+    u1.y,
+  );
+  const v2 = sketch.createVector(
+    (u2.x * (m2 - m1)) / (m1 + m2) + (2 * m1 * u1.x) / (m1 + m2),
+    u2.y,
+  );
+
+  const newV1 = v1.copy().rotate(-angle);
+  const newV2 = v2.copy().rotate(-angle);
+
+  c1.velocity = newV1;
+  c2.velocity = newV2;
+};
+
+const resolvePenetrationToEdges = (circle: Circle) => {
+  if (circle.position.x - circle.radius <= CANVAS_ORIGIN_X) {
+    const depth = circle.radius - circle.position.x;
+    circle.position.x = circle.position.x + depth;
+  }
+
+  if (circle.position.x + circle.radius >= CANVAS_WIDTH) {
+    const depth = circle.position.x + circle.radius - CANVAS_WIDTH;
+    circle.position.x = circle.position.x - depth;
+  }
+
+  if (circle.position.y - circle.radius < CANVAS_ORIGIN_Y) {
+    const depth = circle.radius - circle.position.y;
+    circle.position.y = circle.position.y + depth;
+  }
+
+  if (circle.position.y + circle.radius > CANVAS_HEIGHT) {
+    const depth = circle.position.y + circle.radius - CANVAS_HEIGHT;
+    circle.position.y = circle.position.y - depth;
+  }
+};
+
+const resolveCollisionToEdges = (circle: Circle) => {
+  if (circle.position.x - circle.radius <= CANVAS_ORIGIN_X) {
+    circle.velocity = sketch.createVector(
+      circle.velocity.x * -1,
+      circle.velocity.y,
+    );
+  }
+
+  if (circle.position.x + circle.radius >= CANVAS_WIDTH) {
+    circle.velocity = sketch.createVector(
+      circle.velocity.x * -1,
+      circle.velocity.y,
+    );
+  }
+
+  if (circle.position.y - circle.radius <= CANVAS_ORIGIN_Y) {
+    circle.velocity = sketch.createVector(
+      circle.velocity.x,
+      circle.velocity.y * -1,
+    );
+  }
+
+  if (circle.position.y + circle.radius >= CANVAS_HEIGHT) {
+    circle.velocity = sketch.createVector(
+      circle.velocity.x,
+      circle.velocity.y * -1,
+    );
+  }
 };
 
 const circles = [
-  new Circle(400, 400, 48, 48, '#FBCFE8'),
+  new Circle(400, 400, 48, 48),
   new Circle(160, 160, 24, 24),
   new Circle(240, 240, 24, 24),
   new Circle(320, 320, 24, 24),
@@ -89,30 +140,34 @@ sketch.setup = () => {
 };
 
 sketch.draw = () => {
-  sketch.background('#DB2777');
+  sketch.background('#111827');
+  sketch.stroke('#FFFFFF');
+  sketch.strokeWeight(1);
+  sketch.noFill();
+  sketch.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
   if (upArrowKeyIsPressed) {
-    controlTargetCircle.accelerate('y', JERK * -1);
+    controlTargetCircle.acceleration.y = -1;
   }
 
   if (downArrowKeyIsPressed) {
-    controlTargetCircle.accelerate('y', JERK);
+    controlTargetCircle.acceleration.y = 1;
   }
 
   if (leftArrowKeyIsPressed) {
-    controlTargetCircle.accelerate('x', JERK * -1);
+    controlTargetCircle.acceleration.x = -1;
   }
 
   if (rightArrowKeyIsPressed) {
-    controlTargetCircle.accelerate('x', 1);
+    controlTargetCircle.acceleration.x = 1;
   }
 
   if (!upArrowKeyIsPressed && !downArrowKeyIsPressed) {
-    controlTargetCircle.accelerate('y', 0);
+    controlTargetCircle.acceleration.y = 0;
   }
 
   if (!leftArrowKeyIsPressed && !rightArrowKeyIsPressed) {
-    controlTargetCircle.accelerate('x', 0);
+    controlTargetCircle.acceleration.x = 0;
   }
 
   circles.forEach((circle, index) => {
@@ -120,6 +175,9 @@ sketch.draw = () => {
     circle.drawRepositionedCircle();
     circle.drawVelocityGuide();
     circle.drawAccelerationGuide();
+
+    resolvePenetrationToEdges(circle);
+    resolveCollisionToEdges(circle);
 
     for (let i = index + 1; i < circles.length; i += 1) {
       const targetCircle = circles[i];
@@ -167,7 +225,6 @@ sketch.keyPressed = () => {
 
 sketch.keyReleased = () => {
   const { keyCode } = sketch;
-  console.log(keyCode);
 
   if (keyCode === UP_KEY_CODE || keyCode === UP_ARROW_KEY_CODE) {
     upArrowKeyIsPressed = false;
